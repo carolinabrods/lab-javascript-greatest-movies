@@ -17,8 +17,6 @@ function howManyMovies(moviesArray) {
   return moviesStevenDrama.length;
 }
 
-console.log(howManyMovies(moviesArray));
-
 // Iteration 3: All scores average - Get the average of all scores with 2 decimals
 function scoresAverage(moviesArray) {
   if (moviesArray.length === 0) {
@@ -96,7 +94,69 @@ function orderAlphabetically(moviesArray) {
 }
 
 // BONUS - Iteration 7: Time Format - Turn duration of the movies from hours to minutes
-function turnHoursToMinutes(moviesArray) {}
+function turnHoursToMinutes(moviesArray) {
+  let copyMoviesArray = JSON.parse(JSON.stringify(moviesArray));
+  let newMoviesArray = copyMoviesArray.map(movie => {
+    let moviesHours = 0;
+    let moviesMinutes = 0;
+
+    if (movie.duration.length >= 3) {
+      let moviesDurationSplitted = movie.duration.split(' ', 2);
+      moviesHours = parseInt(moviesDurationSplitted[0].replace('h', ''), 10);
+      moviesMinutes = parseInt(
+        moviesDurationSplitted[1].replace('min', ''),
+        10
+      );
+    } else {
+      let moviesDuration = movie.duration;
+      moviesHours = parseInt(moviesDuration.replace('h', ''), 10);
+      moviesMinutes = 0;
+    }
+
+    movie.duration = moviesHours * 60 + moviesMinutes;
+    return movie;
+  });
+
+  return newMoviesArray;
+}
 
 // BONUS - Iteration 8: Best yearly score average - Best yearly score average
-function bestYearAvg(moviesArray) {}
+function bestYearAvg(moviesArray) {
+  // return null if empty array
+  if (moviesArray.length === 0) {
+    return null;
+  }
+
+  // group movies by release year and calculate average score
+  const scoresByYear = {};
+  moviesArray.forEach(movie => {
+    const year = movie.year;
+    const score = movie.score;
+
+    if (scoresByYear[year]) {
+      scoresByYear[year].totalScore += score;
+      scoresByYear[year].movieCount++;
+    } else {
+      scoresByYear[year] = { totalScore: score, movieCount: 1 };
+    }
+  });
+
+  // find the year with the highest average score
+  let bestYear = null;
+  let bestAvg = 0;
+
+  for (let year in scoresByYear) {
+    const avgScore =
+      scoresByYear[year].totalScore / scoresByYear[year].movieCount;
+    if (
+      avgScore > bestAvg ||
+      (avgScore === bestAvg && parseInt(year) < parseInt(bestYear))
+    ) {
+      bestYear = year;
+      bestAvg = avgScore;
+    }
+  }
+
+  // return the message as a string
+  return `The best year was ${bestYear} with an average score of ${bestAvg}`;
+}
